@@ -1,487 +1,972 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>จำลองแก้วนม 8 oz - สเกลสีแดง + สีสมจริง</title>
-<style>
-* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Noto Sans Thai"; }
-body {
-  margin: 0;
-  padding: 20px;
-  background: #14181d;
-  color: #fff;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบแก้ไขไทม์แสตมป์</title>
+  
+  <!-- Font Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 
-h1 {
-  text-align: center;
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #f1f1f1;
-}
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --secondary: #64748b;
+      --secondary-hover: #475569;
+      --success: #10b981;
+      --success-hover: #059669;
+      --accent: #f59e0b;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --radius: 12px;
+    }
 
-.main-layout {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 20px;
-  max-width: 1450px;
-  margin: 0 auto;
-}
+    * {
+      box-sizing: border-box;
+      font-family: "Prompt", "ArialMT", "Arial", sans-serif;
+      font-weight: 300;
+    }
 
-/* Section Cards */
-.card-section {
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-  display: flex;
-  flex-direction: column;
-}
-.card-section.all-cafe { background: #2c1d11; }
-.card-section.all-select { background: #0f2338; }
+    body {
+      background-color: var(--bg);
+      margin: 0;
+      padding: 20px;
+      color: var(--text);
+    }
 
-.section-title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  text-align: center;
-}
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
 
-.sub-cups-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  height: 100%;
-}
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
 
-.cup-box {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 12px;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    .header h1 {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--primary);
+      margin: 0 0 6px 0;
+    }
 
-.cup-title {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #ffd166;
-}
+    .header p {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin: 0;
+    }
 
-/* Glass & Stage Design */
-.stage {
-  position: relative;
-  width: 250px;
-  height: 380px;
-  margin: 5px 0 15px 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
+    .grid-dashboard {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
 
-/* Measuring Cup Glass Shape */
-.measuring-cup {
-  position: relative;
-  width: 190px;
-  height: 310px;
-  border: 4px solid rgba(255, 255, 255, 0.6);
-  border-top: none;
-  border-radius: 0 0 30px 30px;
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(4px);
-  box-shadow: inset 0 0 20px rgba(255,255,255,0.2), 0 10px 25px rgba(0,0,0,0.4);
-}
+    @media (max-width: 900px) {
+      .grid-dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
 
-/* Cup Handle */
-.measuring-cup::after {
-  content: "";
-  position: absolute;
-  right: -30px;
-  top: 30px;
-  width: 26px;
-  height: 170px;
-  border: 5px solid rgba(255, 255, 255, 0.5);
-  border-left: none;
-  border-radius: 0 25px 45px 0;
-}
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
 
-/* Liquid Container */
-.liquid-body {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: 0 0 26px 26px;
-}
+    .section-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-.liquid {
-  position: absolute;
-  left: 0;
-  right: 0;
-  transition: height 0.25s ease, bottom 0.25s ease;
-}
+    .section-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
 
-/* Realistic Milk (Bottom Layer - Creamy Ivory) */
-.liquid-milk {
-  bottom: 0;
-  background: linear-gradient(to top, #dfcfb6, #f3e9d7);
-  box-shadow: inset 0 2px 4px rgba(255,255,255,0.6);
-}
+    .section-card.sec-1 {
+      border-left: 5px solid #3b82f6;
+      background: #f8fafc;
+    }
+    .section-card.sec-2 {
+      border-left: 5px solid #f59e0b;
+      background: #fffdf5;
+    }
+    .section-card.sec-3 {
+      border-left: 5px solid #ef4444;
+      background: #fff5f5;
+    }
+    .section-card.sec-4 {
+      border-left: 5px solid #10b981;
+      background: #f0fdf4;
+    }
 
-/* Realistic Milk Foam (Top Layer - White & Fluffy Texture) */
-.liquid-foam {
-  background: linear-gradient(to top, #ebe2d3, #ffffff);
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.9) 0, rgba(255,255,255,0.9) 3px, transparent 4px),
-    radial-gradient(circle at 60% 70%, rgba(255,255,255,0.8) 0, rgba(255,255,255,0.8) 4px, transparent 5px),
-    radial-gradient(circle at 80% 25%, rgba(255,255,255,0.85) 0, rgba(255,255,255,0.85) 3px, transparent 4px),
-    linear-gradient(to top, #ebe2d3, #ffffff);
-  border-top: 3px solid #ffffff;
-  box-shadow: inset 0 2px 8px rgba(255,255,255,0.9);
-}
+    .section-title {
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 2px;
+    }
 
-/* Red Scale Lines & Red Text Labels */
-.scale-marks {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
-}
+    .sec-title-1 { color: #1d4ed8; }
+    .sec-title-2 { color: #b45309; }
+    .sec-title-3 { color: #b91c1c; }
+    .sec-title-4 { color: #047857; }
 
-.mark-line {
-  position: absolute;
-  left: 4px;
-  right: 4px;
-  border-bottom: 1.5px solid #d32f2f;
-  font-size: 9px;
-  font-weight: 800;
-  color: #d32f2f;
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: 1px;
-  text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.9);
-}
+    .form-group, .coords-row > div, .custom-time-row > div {
+      min-width: 0;
+    }
 
-.mark-minor {
-  border-bottom: 1px dashed rgba(211, 47, 47, 0.65);
-  font-size: 8px;
-  font-weight: 700;
-}
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-/* Percentages based on 250ml / 8oz Max Capacity scale */
-.pos-50ml  { bottom: 20%; }
-.pos-1-4   { bottom: 24%; }  /* 1/4 CUP & 2 oz & 60ml */
-.pos-75ml  { bottom: 30%; }
-.pos-1-3   { bottom: 33.3%; }/* 1/3 CUP */
-.pos-100ml { bottom: 40%; }
-.pos-125ml { bottom: 50%; }  /* 125ml */
-.pos-1-2   { bottom: 48%; }  /* 1/2 CUP & 4 oz */
-.pos-150ml { bottom: 60%; }
-.pos-2-3   { bottom: 64%; }  /* 2/3 CUP */
-.pos-175ml { bottom: 70%; }
-.pos-3-4   { bottom: 72%; }  /* 3/4 CUP & 6 oz */
-.pos-200ml { bottom: 80%; }
-.pos-225ml { bottom: 90%; }
-.pos-1-c   { bottom: 96%; border-bottom: 2px solid #b71c1c; } /* 1 CUP & 8 oz & 250ml */
+    label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-/* Floating Data Badges */
-.tag {
-  position: absolute;
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: bold;
-  color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-  z-index: 20;
-  transition: bottom 0.25s ease;
-  white-space: nowrap;
-}
-.tag-milk { background: #8d6e63; left: -75px; border: 1px solid #bcaaa4; }
-.tag-foam { background: #546e7a; left: -75px; border: 1px solid #90a4ae; }
+    input[type="text"], 
+    input[type="number"], 
+    input[type="date"], 
+    input[type="time"], 
+    select, 
+    textarea {
+      width: 100%;
+      max-width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      background: #ffffff;
+      color: var(--text);
+      outline: none;
+      transition: all 0.2s;
+    }
 
-/* Controls */
-.controls {
-  width: 100%;
-  background: rgba(0,0,0,0.3);
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: auto;
-}
-.control-group {
-  margin-bottom: 8px;
-}
-.control-group label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  margin-bottom: 4px;
-}
-input[type=range] {
-  width: 100%;
-  accent-color: #ffd166;
-  cursor: pointer;
-}
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
 
-.total-box {
-  margin-top: 8px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: bold;
-  background: rgba(255,255,255,0.15);
-  padding: 6px;
-  border-radius: 6px;
-}
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
 
-@media(max-width: 1100px) {
-  .main-layout { grid-template-columns: 1fr; }
-}
-@media(max-width: 700px) {
-  .sub-cups-grid { grid-template-columns: 1fr; }
-}
-</style>
+    textarea {
+      resize: vertical;
+      min-height: 85px;
+      line-height: 1.4;
+    }
+
+    .drop-zone {
+      border: 2px dashed #93c5fd;
+      border-radius: var(--radius);
+      padding: 16px 10px;
+      text-align: center;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .drop-zone-icon {
+      font-size: 26px;
+      margin-bottom: 2px;
+    }
+
+    .drop-zone-text {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .drop-zone-text strong {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 400;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:hover { background-color: var(--primary-hover); }
+    .btn-secondary { background-color: var(--secondary); }
+    .btn-secondary:hover { background-color: var(--secondary-hover); }
+    .btn-success { background-color: var(--success); }
+    .btn-success:hover { background-color: var(--success-hover); }
+    .btn-block { width: 100%; }
+
+    .coords-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    #image-list-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .photo-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .img-preview-box {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: #0f172a;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .img-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .overlay-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(15, 23, 42, 0.75);
+      color: white;
+      font-size: 10px;
+      padding: 3px 6px;
+      border-radius: 4px;
+    }
+
+    .photo-card-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .file-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .custom-time-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .custom-time-row input {
+      font-size: 11px;
+      padding: 5px 4px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(15, 23, 42, 0.88);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      max-width: 92%;
+      max-height: 92%;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      color: white;
+      font-size: 32px;
+      cursor: pointer;
+    }
+
+    .val-badge {
+      background: #e2e8f0;
+      color: var(--text);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .status-indicator {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 4px;
+    }
+  </style>
 </head>
 <body>
 
-<h1>จำลองแก้วนม 8 oz (สเกลสีแดง + สีน้ำนมและฟองนมสมจริง)</h1>
-
-<div class="main-layout">
-
-  <!-- Section 1: All cafe -->
-  <div class="card-section all-cafe">
-    <div class="section-title">เมนูนม All cafe</div>
-    
-    <div class="cup-box">
-      <div class="cup-title">แก้วมาตรฐาน</div>
-      
-      <div class="stage">
-        <div class="measuring-cup">
-          <div class="liquid-body">
-            <div id="cafe-milk" class="liquid liquid-milk"></div>
-            <div id="cafe-foam" class="liquid liquid-foam"></div>
-          </div>
-          
-          <!-- Red Scales (CUP / oz / ml) -->
-          <div class="scale-marks">
-            <div class="mark-line pos-1-c"><span>1 CUP</span><span>8 oz</span><span>250 ml</span></div>
-            <div class="mark-line mark-minor pos-225ml"><span></span><span></span><span>225 ml</span></div>
-            <div class="mark-line pos-200ml"><span></span><span></span><span>200 ml</span></div>
-            <div class="mark-line pos-3-4"><span>3/4 CUP</span><span>6 oz</span><span></span></div>
-            <div class="mark-line mark-minor pos-175ml"><span></span><span></span><span>175 ml</span></div>
-            <div class="mark-line pos-2-3"><span>2/3 CUP</span><span></span><span></span></div>
-            <div class="mark-line pos-150ml"><span></span><span></span><span>150 ml</span></div>
-            <div class="mark-line pos-125ml"><span></span><span></span><span>125 ml</span></div>
-            <div class="mark-line pos-1-2"><span>1/2 CUP</span><span>4 oz</span><span></span></div>
-            <div class="mark-line pos-100ml"><span></span><span></span><span>100 ml</span></div>
-            <div class="mark-line pos-1-3"><span>1/3 CUP</span><span></span><span></span></div>
-            <div class="mark-line mark-minor pos-75ml"><span></span><span></span><span>75 ml</span></div>
-            <div class="mark-line pos-1-4"><span>1/4 CUP</span><span>2 oz</span><span></span></div>
-            <div class="mark-line mark-minor pos-50ml"><span></span><span></span><span>50 ml</span></div>
-          </div>
-
-          <div id="cafe-milk-tag" class="tag tag-milk">น้ำนม 2.5 oz</div>
-          <div id="cafe-foam-tag" class="tag tag-foam">ฟองนม 4.5 oz</div>
-        </div>
-      </div>
-
-      <div class="controls">
-        <div class="control-group">
-          <label>
-            <span>🥛 น้ำนม (สีครีมนม)</span>
-            <span id="txt-cafe-milk">2.5 oz</span>
-          </label>
-          <input type="range" id="slider-cafe-milk" min="0" max="8" step="0.1" value="2.5">
-        </div>
-
-        <div class="control-group">
-          <label>
-            <span>☁️ ฟองนม (สีขาวฟู)</span>
-            <span id="txt-cafe-foam">4.5 oz</span>
-          </label>
-          <input type="range" id="slider-cafe-foam" min="0" max="8" step="0.1" value="4.5">
-        </div>
-
-        <div class="total-box">
-          รวม: <span id="txt-cafe-total">7.0</span> oz (<span id="txt-cafe-total-ml">210</span> ml)
-        </div>
-      </div>
-    </div>
+<div class="container">
+  <div class="header">
+    <h1>📸 ระบบแก้ไขไทม์แสตมป์</h1>
+    <p>วางลิงก์ Google Maps เพื่อดึงพิกัดและที่อยู่โดยละเอียดอัตโนมัติ</p>
   </div>
 
-  <!-- Section 2: All select (2 Cups) -->
-  <div class="card-section all-select">
-    <div class="section-title">เมนูนม All select</div>
-    
-    <div class="sub-cups-grid">
+  <div class="grid-dashboard">
+    <div class="panel">
       
-      <!-- Cup 1 -->
-      <div class="cup-box">
-        <div class="cup-title">All select (แก้วที่ 1)</div>
-        
-        <div class="stage">
-          <div class="measuring-cup">
-            <div class="liquid-body">
-              <div id="select1-milk" class="liquid liquid-milk"></div>
-              <div id="select1-foam" class="liquid liquid-foam"></div>
-            </div>
-            
-            <div class="scale-marks">
-              <div class="mark-line pos-1-c"><span>1 CUP</span><span>8 oz</span><span>250 ml</span></div>
-              <div class="mark-line mark-minor pos-225ml"><span></span><span></span><span>225 ml</span></div>
-              <div class="mark-line pos-200ml"><span></span><span></span><span>200 ml</span></div>
-              <div class="mark-line pos-3-4"><span>3/4 CUP</span><span>6 oz</span><span></span></div>
-              <div class="mark-line mark-minor pos-175ml"><span></span><span></span><span>175 ml</span></div>
-              <div class="mark-line pos-2-3"><span>2/3 CUP</span><span></span><span></span></div>
-              <div class="mark-line pos-150ml"><span></span><span></span><span>150 ml</span></div>
-              <div class="mark-line pos-125ml"><span></span><span></span><span>125 ml</span></div>
-              <div class="mark-line pos-1-2"><span>1/2 CUP</span><span>4 oz</span><span></span></div>
-              <div class="mark-line pos-100ml"><span></span><span></span><span>100 ml</span></div>
-              <div class="mark-line pos-1-3"><span>1/3 CUP</span><span></span><span></span></div>
-              <div class="mark-line mark-minor pos-75ml"><span></span><span></span><span>75 ml</span></div>
-              <div class="mark-line pos-1-4"><span>1/4 CUP</span><span>2 oz</span><span></span></div>
-              <div class="mark-line mark-minor pos-50ml"><span></span><span></span><span>50 ml</span></div>
-            </div>
-
-            <div id="select1-milk-tag" class="tag tag-milk">น้ำนม 2.3 oz</div>
-            <div id="select1-foam-tag" class="tag tag-foam">ฟองนม 4.7 oz</div>
-          </div>
+      <!-- 1. อัปโหลด -->
+      <div class="section-card sec-1">
+        <div class="section-title sec-title-1">
+          <span>📁 1. อัปโหลดรูปภาพ</span>
         </div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('imageInput').click()">
+          <div class="drop-zone-icon">🖼️</div>
+          <div class="drop-zone-text">ลากไฟล์มาวางที่นี่ หรือ <strong>คลิกเลือกรูปภาพ</strong></div>
+          <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="loadSelectedFiles(this.files)">
+        </div>
+      </div>
 
-        <div class="controls">
-          <div class="control-group">
-            <label>
-              <span>🥛 น้ำนม (สีครีมนม)</span>
-              <span id="txt-select1-milk">2.3 oz</span>
-            </label>
-            <input type="range" id="slider-select1-milk" min="0" max="8" step="0.1" value="2.3">
+      <!-- 2. ตั้งค่าเวลาหลัก -->
+      <div class="section-card sec-2">
+        <div class="section-title sec-title-2">
+          <span>⏰ 2. วันและเวลาหลัก</span>
+        </div>
+        <div class="form-group">
+          <label for="globalDateInput">วันที่หลัก:</label>
+          <input type="date" id="globalDateInput" onchange="applyGlobalTimeToAll()">
+        </div>
+        <div class="form-group">
+          <label for="globalTimeInput">เวลาหลัก:</label>
+          <input type="time" id="globalTimeInput" step="1" onchange="applyGlobalTimeToAll()">
+        </div>
+        <button class="btn btn-secondary btn-block" style="font-size:11px; margin-top:2px;" onclick="applyGlobalTimeToAll()">🔄 ซิงค์วัน-เวลาหลักไปทุกรูป</button>
+      </div>
+
+      <!-- 3. ตั้งค่าพิกัด Google Maps -->
+      <div class="section-card sec-3">
+        <div class="section-title sec-title-3">
+          <span>📍 3. พิกัดตำแหน่ง (Google Maps)</span>
+        </div>
+        <div class="form-group">
+          <label for="gmapsUrlInput">วางลิงก์ Google Maps หรือ พิกัด:</label>
+          <input type="text" id="gmapsUrlInput" placeholder="วางลิงก์ Google Maps หรือ 14.8012, 100.6531..." oninput="parseGoogleMapsUrl(this.value)">
+        </div>
+        <div class="coords-row">
+          <div class="form-group">
+            <label>ละติจูด (Lat)</label>
+            <input type="number" id="latInput" step="any" value="14.8012" oninput="triggerAutoProcess()">
           </div>
-
-          <div class="control-group">
-            <label>
-              <span>☁️ ฟองนม (สีขาวฟู)</span>
-              <span id="txt-select1-foam">4.7 oz</span>
-            </label>
-            <input type="range" id="slider-select1-foam" min="0" max="8" step="0.1" value="4.7">
-          </div>
-
-          <div class="total-box">
-            รวม: <span id="txt-select1-total">7.0</span> oz (<span id="txt-select1-total-ml">210</span> ml)
+          <div class="form-group">
+            <label>ลองติจูด (Long)</label>
+            <input type="number" id="lngInput" step="any" value="100.6531" oninput="triggerAutoProcess()">
           </div>
         </div>
       </div>
 
-      <!-- Cup 2 -->
-      <div class="cup-box">
-        <div class="cup-title">All select (แก้วที่ 2)</div>
+      <!-- 4. มินิแมพ & การแสดงผล -->
+      <div class="section-card sec-4">
+        <div class="section-title sec-title-4">
+          <span>🗺️ 4. มินิแมพ & ข้อความ</span>
+        </div>
         
-        <div class="stage">
-          <div class="measuring-cup">
-            <div class="liquid-body">
-              <div id="select2-milk" class="liquid liquid-milk"></div>
-              <div id="select2-foam" class="liquid liquid-foam"></div>
-            </div>
-            
-            <div class="scale-marks">
-              <div class="mark-line pos-1-c"><span>1 CUP</span><span>8 oz</span><span>250 ml</span></div>
-              <div class="mark-line mark-minor pos-225ml"><span></span><span></span><span>225 ml</span></div>
-              <div class="mark-line pos-200ml"><span></span><span></span><span>200 ml</span></div>
-              <div class="mark-line pos-3-4"><span>3/4 CUP</span><span>6 oz</span><span></span></div>
-              <div class="mark-line mark-minor pos-175ml"><span></span><span></span><span>175 ml</span></div>
-              <div class="mark-line pos-2-3"><span>2/3 CUP</span><span></span><span></span></div>
-              <div class="mark-line pos-150ml"><span></span><span></span><span>150 ml</span></div>
-              <div class="mark-line pos-125ml"><span></span><span></span><span>125 ml</span></div>
-              <div class="mark-line pos-1-2"><span>1/2 CUP</span><span>4 oz</span><span></span></div>
-              <div class="mark-line pos-100ml"><span></span><span></span><span>100 ml</span></div>
-              <div class="mark-line pos-1-3"><span>1/3 CUP</span><span></span><span></span></div>
-              <div class="mark-line mark-minor pos-75ml"><span></span><span></span><span>75 ml</span></div>
-              <div class="mark-line pos-1-4"><span>1/4 CUP</span><span>2 oz</span><span></span></div>
-              <div class="mark-line mark-minor pos-50ml"><span></span><span></span><span>50 ml</span></div>
-            </div>
+        <div class="form-group">
+          <label for="showMinimapSelect">แสดงมินิแมพ:</label>
+          <select id="showMinimapSelect" onchange="toggleMinimapControls(); triggerAutoProcess();">
+            <option value="yes" selected>🗺️ มีมินิแมพ</option>
+            <option value="no">🚫 ไม่มีมินิแมพ</option>
+          </select>
+        </div>
 
-            <div id="select2-milk-tag" class="tag tag-milk">น้ำนม 3.0 oz</div>
-            <div id="select2-foam-tag" class="tag tag-foam">ฟองนม 4.0 oz</div>
+        <div id="minimapOptionsGroup" style="display:flex; flex-direction:column; gap:8px;">
+          <div class="form-group">
+            <label for="minimapPosSelect">ตำแหน่งมินิแมพ:</label>
+            <select id="minimapPosSelect" onchange="triggerAutoProcess()">
+              <option value="bottom-left" selected>ซ้ายล่าง (ชิดขอบ)</option>
+              <option value="bottom-right">ขวาล่าง (ชิดขอบ)</option>
+              <option value="top-left">ซ้ายบน (ชิดขอบ)</option>
+              <option value="top-right">ขวาบน (ชิดขอบ)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="minimapSizeInput">
+              <span>ขนาดมินิแมพ:</span>
+              <span id="sizeValDisplay" class="val-badge">25%</span>
+            </label>
+            <input type="range" id="minimapSizeInput" min="15" max="45" step="1" value="25" oninput="document.getElementById('sizeValDisplay').innerText = this.value + '%'; triggerAutoProcess();">
+          </div>
+
+          <div class="form-group">
+            <label for="zoomSelect">ระดับการซูมแผนที่:</label>
+            <select id="zoomSelect" onchange="triggerAutoProcess()">
+              <option value="13">ซูมไกล (ระดับตำบล)</option>
+              <option value="15" selected>ซูมปานกลาง (ระดับหมู่บ้าน)</option>
+              <option value="17">ซูมใกล้ (ระดับถนน/ซอย)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="minimapOpacityInput">
+              <span>ความทึบมินิแมพ:</span>
+              <span id="opacityValDisplay" class="val-badge">100%</span>
+            </label>
+            <input type="range" id="minimapOpacityInput" min="0.1" max="1.0" step="0.05" value="1.0" oninput="document.getElementById('opacityValDisplay').innerText = Math.round(this.value * 100) + '%'; triggerAutoProcess();">
           </div>
         </div>
 
-        <div class="controls">
-          <div class="control-group">
-            <label>
-              <span>🥛 น้ำนม (สีครีมนม)</span>
-              <span id="txt-select2-milk">3.0 oz</span>
-            </label>
-            <input type="range" id="slider-select2-milk" min="0" max="8" step="0.1" value="3.0">
-          </div>
+        <div class="form-group">
+          <label for="positionSelect">ตำแหน่งการวางข้อความ:</label>
+          <select id="positionSelect" onchange="triggerAutoProcess()">
+            <option value="bottom-right" selected>ขวาล่าง</option>
+            <option value="bottom-left">ซ้ายล่าง</option>
+            <option value="top-right">ขวาบน</option>
+            <option value="top-left">ซ้ายบน</option>
+          </select>
+        </div>
 
-          <div class="control-group">
-            <label>
-              <span>☁️ ฟองนม (สีขาวฟู)</span>
-              <span id="txt-select2-foam">4.0 oz</span>
-            </label>
-            <input type="range" id="slider-select2-foam" min="0" max="8" step="0.1" value="4.0">
+        <div class="form-group">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label for="addressInput">รายละเอียดสถานที่:</label>
+            <button class="btn btn-secondary" style="padding:2px 6px; font-size:10px;" onclick="reverseGeocode()">🔍 ดึงสถานที่จากพิกัด</button>
           </div>
-
-          <div class="total-box">
-            รวม: <span id="txt-select2-total">7.0</span> oz (<span id="txt-select2-total-ml">210</span> ml)
-          </div>
+          <textarea id="addressInput" oninput="triggerAutoProcess()">14.801200, 100.653100
+ตำบลพรหมมาสตร์ อำเภอเมืองลพบุรี
+ลพบุรี 15000</textarea>
         </div>
       </div>
+
+      <!-- Status Indicator & Action Button -->
+      <div id="statusIndicator" class="status-indicator">⚡ แสดงผลเรียลไทม์อัตโนมัติ</div>
+      <button class="btn btn-success btn-block" id="downloadAllBtn" onclick="downloadAllPng()" style="display:none; padding: 11px; font-weight:500; font-size:14px;">📥 ดาวน์โหลดทั้งหมด (PNG)</button>
 
     </div>
-  </div>
 
+    <!-- Gallery -->
+    <div>
+      <div id="image-list-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal ดูภาพขยาย -->
+<div id="previewModal" class="modal" onclick="closeModal()">
+  <span class="modal-close">&times;</span>
+  <img class="modal-content" id="modalImage">
 </div>
 
 <script>
-function setupCupSimulator(prefix) {
-  const milkSlider = document.getElementById(`slider-${prefix}-milk`);
-  const foamSlider = document.getElementById(`slider-${prefix}-foam`);
+  let imageItems = [];
+  let debounceTimer = null;
 
-  const milkLiquid = document.getElementById(`${prefix}-milk`);
-  const foamLiquid = document.getElementById(`${prefix}-foam`);
+  const now = new Date();
+  document.getElementById('globalDateInput').value = now.toISOString().split('T')[0];
+  document.getElementById('globalTimeInput').value = now.toTimeString().split(' ')[0];
 
-  const milkTag = document.getElementById(`${prefix}-milk-tag`);
-  const foamTag = document.getElementById(`${prefix}-foam-tag`);
+  const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 
-  const milkText = document.getElementById(`txt-${prefix}-milk`);
-  const foamText = document.getElementById(`txt-${prefix}-foam`);
-  const totalText = document.getElementById(`txt-${prefix}-total`);
-  const totalMlText = document.getElementById(`txt-${prefix}-total-ml`);
-
-  function update() {
-    const milkVal = parseFloat(milkSlider.value);
-    const foamVal = parseFloat(foamSlider.value);
-    const totalVal = milkVal + foamVal;
-    const totalMl = Math.round(totalVal * 30); // 1 oz ≈ 30 ml
-
-    // ความสูงเปรียบเทียบกับความจุแก้ว 8 oz (96% Height Scale)
-    const milkPct = (milkVal / 8) * 96;
-    const foamPct = (foamVal / 8) * 96;
-
-    milkLiquid.style.height = `${milkPct}%`;
-    foamLiquid.style.height = `${foamPct}%`;
-    foamLiquid.style.bottom = `${milkPct}%`;
-
-    milkTag.style.bottom = `${milkPct / 2}%`;
-    foamTag.style.bottom = `${Math.min(milkPct + (foamPct / 2), 88)}%`;
-
-    milkText.textContent = `${milkVal.toFixed(1)} oz`;
-    foamText.textContent = `${foamVal.toFixed(1)} oz`;
-    totalText.textContent = `${totalVal.toFixed(1)}`;
-    totalMlText.textContent = `${totalMl}`;
-
-    milkTag.textContent = `น้ำนม ${milkVal.toFixed(1)} oz`;
-    foamTag.textContent = `ฟองนม ${foamVal.toFixed(1)} oz`;
+  function formatThaiDate(dateStr) {
+    if (!dateStr) return "";
+    const [year, month, day] = dateStr.split('-');
+    const thaiYear = parseInt(year) + 543;
+    const monthName = thaiMonths[parseInt(month) - 1];
+    return `${parseInt(day)} ${monthName} ${thaiYear}`;
   }
 
-  milkSlider.addEventListener('input', update);
-  foamSlider.addEventListener('input', update);
-  update();
-}
+  function getPngFileName(originalName) {
+    const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
+    return `stamped_${nameWithoutExt}.png`;
+  }
 
-// ผูกการทำงานกับแก้วทั้ง 3 ใบ
-setupCupSimulator('cafe');
-setupCupSimulator('select1');
-setupCupSimulator('select2');
+  function toggleMinimapControls() {
+    const show = document.getElementById('showMinimapSelect').value === 'yes';
+    document.getElementById('minimapOptionsGroup').style.display = show ? 'flex' : 'none';
+  }
+
+  function parseGoogleMapsUrl(input) {
+    if (!input || !input.trim()) return;
+
+    let lat = null;
+    let lng = null;
+
+    let match = input.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+
+    if (!match) {
+      match = input.match(/(?:q|ll|search\/|place\/)(-?\d+\.\d+)[,\+]\s*(-?\d+\.\d+)/);
+    }
+
+    if (!match) {
+      match = input.match(/(-?\d+\.\d+)\s*[\s,]\s*(-?\d+\.\d+)/);
+    }
+
+    if (match) {
+      lat = parseFloat(match[1]);
+      lng = parseFloat(match[2]);
+
+      document.getElementById('latInput').value = lat.toFixed(6);
+      document.getElementById('lngInput').value = lng.toFixed(6);
+
+      reverseGeocode();
+    }
+  }
+
+  function triggerAutoProcess() {
+    const status = document.getElementById('statusIndicator');
+    status.innerText = '⏳ กำลังอัปเดต...';
+    
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(async () => {
+      if (imageItems.length > 0) {
+        await processImages();
+      }
+      status.innerText = '⚡ แสดงผลเรียลไทม์อัตโนมัติ';
+    }, 200);
+  }
+
+  const dropZone = document.getElementById('dropZone');
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+  });
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    loadSelectedFiles(e.dataTransfer.files);
+  });
+
+  async function reverseGeocode() {
+    const latVal = parseFloat(document.getElementById('latInput').value);
+    const lngVal = parseFloat(document.getElementById('lngInput').value);
+    if (isNaN(latVal) || isNaN(lngVal)) return;
+
+    const coordString = `${latVal.toFixed(6)}, ${lngVal.toFixed(6)}`;
+
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latVal}&lon=${lngVal}&accept-language=th`);
+      const data = await res.json();
+      
+      let lines = [coordString];
+
+      if (data && data.address) {
+        const addr = data.address;
+
+        let detailParts = [];
+        if (addr.house_number) detailParts.push(addr.house_number);
+        if (addr.building) detailParts.push(addr.building);
+        if (addr.village) {
+          detailParts.push(addr.village.startsWith('หมู่') ? addr.village : `หมู่${addr.village}`);
+        }
+        if (addr.road) detailParts.push(`ถนน${addr.road.replace(/^ถนน\s*/, '')}`);
+
+        let rawSub = addr.subdistrict || addr.suburb || addr.hamlet || "";
+        let subText = "";
+        if (rawSub) {
+          if (rawSub.startsWith('ตำบล') || rawSub.startsWith('ต.') || rawSub.startsWith('แขวง')) {
+            subText = rawSub;
+          } else {
+            subText = `ตำบล${rawSub}`;
+          }
+        }
+
+        let rawDist = addr.district || addr.city_district || addr.county || addr.city || "";
+        let distText = "";
+        if (rawDist) {
+          if (rawDist.startsWith('อำเภอ') || rawDist.startsWith('อ.') || rawDist.startsWith('เขต')) {
+            distText = rawDist;
+          } else {
+            distText = `อำเภอ${rawDist}`;
+          }
+        }
+
+        let rawProv = addr.province || addr.state || "";
+        let provText = rawProv.replace(/^จังหวัด\s*/, '');
+        let postcode = addr.postcode || "";
+
+        let fullAddrLine = detailParts.join(' ');
+        if (subText) fullAddrLine += (fullAddrLine ? ' ' : '') + subText;
+        if (distText) fullAddrLine += (fullAddrLine ? ' ' : '') + distText;
+
+        if (fullAddrLine.trim()) {
+          lines.push(fullAddrLine.trim());
+        }
+
+        let provLine = provText;
+        if (postcode) provLine += ` ${postcode}`;
+        if (provLine.trim()) {
+          lines.push(provLine.trim());
+        }
+
+        if (lines.length === 1 && data.display_name) {
+          lines.push(data.display_name);
+        }
+      }
+
+      document.getElementById('addressInput').value = lines.join('\n');
+      triggerAutoProcess();
+
+    } catch (e) {
+      console.error('Reverse Geocode Failed', e);
+      document.getElementById('addressInput').value = `${coordString}\n(ไม่สามารถดึงข้อมูลที่อยู่ได้)`;
+      triggerAutoProcess();
+    }
+  }
+
+  function loadSelectedFiles(files) {
+    const fileArray = Array.from(files).filter(file => file.type.startsWith('image/'));
+    if (fileArray.length === 0) return;
+
+    const defaultDate = document.getElementById('globalDateInput').value;
+    const defaultTime = document.getElementById('globalTimeInput').value;
+
+    imageItems = fileArray.map((file, index) => {
+      let timeObj = new Date(`1970-01-01T${defaultTime}`);
+      timeObj.setMinutes(timeObj.getMinutes() + index); 
+      let timeString = timeObj.toTimeString().split(' ')[0];
+
+      return {
+        id: index,
+        file: file,
+        date: defaultDate,
+        time: timeString,
+        originalUrl: URL.createObjectURL(file),
+        stampedDataUrl: null
+      };
+    });
+
+    renderImageList();
+    triggerAutoProcess();
+  }
+
+  function applyGlobalTimeToAll() {
+    const gDate = document.getElementById('globalDateInput').value;
+    const gTime = document.getElementById('globalTimeInput').value;
+    imageItems.forEach(item => {
+      item.date = gDate;
+      item.time = gTime;
+    });
+    renderImageList();
+    triggerAutoProcess();
+  }
+
+  function renderImageList() {
+    const container = document.getElementById('image-list-container');
+    container.innerHTML = '';
+
+    if (imageItems.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted); font-size:13px;">ยังไม่ได้เลือกรูปภาพ</div>`;
+      return;
+    }
+
+    imageItems.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = 'photo-card';
+      const displayImgSrc = item.stampedDataUrl || item.originalUrl;
+      const downloadName = getPngFileName(item.file.name);
+
+      card.innerHTML = `
+        <div class="img-preview-box" onclick="openModal('${displayImgSrc}')">
+          <img src="${displayImgSrc}" alt="Preview">
+          <div class="overlay-badge">🔍 คลิกดูภาพใหญ่</div>
+        </div>
+        <div class="photo-card-body">
+          <div class="file-title" title="${item.file.name}">${item.file.name}</div>
+          <div class="custom-time-row">
+            <div class="form-group">
+              <label style="font-size:10px;">วันที่เฉพาะรูป</label>
+              <input type="date" value="${item.date}" onchange="updateItemDate(${index}, this.value)">
+            </div>
+            <div class="form-group">
+              <label style="font-size:10px;">เวลาเฉพาะรูป</label>
+              <input type="time" step="1" value="${item.time}" onchange="updateItemTime(${index}, this.value)">
+            </div>
+          </div>
+          ${item.stampedDataUrl ? `<a class="btn btn-success" href="${item.stampedDataUrl}" download="${downloadName}" style="text-decoration:none; font-size:11px; padding:6px;">⬇️ ดาวน์โหลด PNG</a>` : ''}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function updateItemDate(index, value) { 
+    imageItems[index].date = value; 
+    triggerAutoProcess();
+  }
+  
+  function updateItemTime(index, value) { 
+    imageItems[index].time = value; 
+    triggerAutoProcess();
+  }
+
+  async function processImages() {
+    if (imageItems.length === 0) return;
+    await document.fonts.ready;
+
+    const addressText = document.getElementById('addressInput').value;
+    const position = document.getElementById('positionSelect').value;
+    const showMinimap = document.getElementById('showMinimapSelect').value === 'yes';
+    const minimapPos = document.getElementById('minimapPosSelect').value;
+    const minimapSizePct = parseFloat(document.getElementById('minimapSizeInput').value) / 100;
+    const lat = parseFloat(document.getElementById('latInput').value) || 0;
+    const lng = parseFloat(document.getElementById('lngInput').value) || 0;
+    const zoom = parseInt(document.getElementById('zoomSelect').value) || 15;
+    const opacity = parseFloat(document.getElementById('minimapOpacityInput').value) || 1.0;
+
+    const extraLines = addressText.split('\n').filter(line => line.trim() !== '');
+
+    for (let item of imageItems) {
+      const formattedDate = formatThaiDate(item.date);
+      const line1 = `${formattedDate} ${item.time}`;
+      const linesToDraw = [line1, ...extraLines];
+      item.stampedDataUrl = await renderStampOnImage(item.file, linesToDraw, position, showMinimap, minimapPos, minimapSizePct, lat, lng, zoom, opacity);
+    }
+
+    renderImageList();
+    document.getElementById('downloadAllBtn').style.display = 'block';
+  }
+
+  async function renderMinimap(mCtx, mapWidth, mapHeight, lat, lng, zoom) {
+    const n = Math.pow(2, zoom);
+    const centerX = ((lng + 180) / 360) * n * 256;
+    const latRad = (lat * Math.PI) / 180;
+    const centerY = ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n * 256;
+
+    const startX = centerX - mapWidth / 2;
+    const startY = centerY - mapHeight / 2;
+
+    const minTileX = Math.floor(startX / 256);
+    const maxTileX = Math.floor((startX + mapWidth) / 256);
+    const minTileY = Math.floor(startY / 256);
+    const maxTileY = Math.floor((startY + mapHeight) / 256);
+
+    const tilePromises = [];
+
+    for (let tx = minTileX; tx <= maxTileX; tx++) {
+      for (let ty = minTileY; ty <= maxTileY; ty++) {
+        const tileUrl = `https://tile.openstreetmap.org/${zoom}/${tx}/${ty}.png`;
+        tilePromises.push(new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            const drawX = tx * 256 - startX;
+            const drawY = ty * 256 - startY;
+            mCtx.drawImage(img, drawX, drawY, 256, 256);
+            resolve();
+          };
+          img.onerror = () => resolve();
+          img.src = tileUrl;
+        }));
+      }
+    }
+
+    await Promise.all(tilePromises);
+
+    const pinCenterX = mapWidth / 2;
+    const pinCenterY = mapHeight / 2;
+    const pinRadius = Math.max(12, Math.round(mapWidth * 0.085));
+
+    mCtx.beginPath();
+    mCtx.ellipse(pinCenterX, pinCenterY + pinRadius * 0.8, pinRadius * 0.6, pinRadius * 0.25, 0, 0, Math.PI * 2);
+    mCtx.fillStyle = 'rgba(0,0,0,0.3)';
+    mCtx.fill();
+
+    mCtx.beginPath();
+    mCtx.arc(pinCenterX, pinCenterY - pinRadius * 0.4, pinRadius, 0.2 * Math.PI, 0.8 * Math.PI, true);
+    mCtx.lineTo(pinCenterX, pinCenterY + pinRadius * 0.7);
+    mCtx.closePath();
+    mCtx.fillStyle = '#EA4335';
+    mCtx.fill();
+    mCtx.lineWidth = 2;
+    mCtx.strokeStyle = '#FFFFFF';
+    mCtx.stroke();
+
+    mCtx.beginPath();
+    mCtx.arc(pinCenterX, pinCenterY - pinRadius * 0.4, pinRadius * 0.45, 0, Math.PI * 2);
+    mCtx.fillStyle = '#FFFFFF';
+    mCtx.fill();
+
+    mCtx.beginPath();
+    mCtx.arc(pinCenterX, pinCenterY - pinRadius * 0.4, pinRadius * 0.2, 0, Math.PI * 2);
+    mCtx.fillStyle = '#EA4335';
+    mCtx.fill();
+
+    mCtx.font = `bold ${Math.round(mapWidth * 0.075)}px Arial, sans-serif`;
+    mCtx.fillStyle = 'rgba(100, 100, 100, 0.85)';
+    mCtx.fillText('Google', 10, mapHeight - 10);
+  }
+
+  function renderStampOnImage(file, lines, position, showMinimap, minimapPos, minimapSizePct, lat, lng, zoom, opacity) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = async function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          ctx.drawImage(img, 0, 0);
+
+          if (showMinimap) {
+            const mapWidth = Math.round(canvas.width * minimapSizePct);
+            const mapHeight = mapWidth;
+
+            let mapX = 0, mapY = 0;
+            if (minimapPos === 'bottom-left') {
+              mapX = 0; mapY = canvas.height - mapHeight;
+            } else if (minimapPos === 'bottom-right') {
+              mapX = canvas.width - mapWidth; mapY = canvas.height - mapHeight;
+            } else if (minimapPos === 'top-left') {
+              mapX = 0; mapY = 0;
+            } else if (minimapPos === 'top-right') {
+              mapX = canvas.width - mapWidth; mapY = 0;
+            }
+
+            const mapCanvas = document.createElement('canvas');
+            mapCanvas.width = mapWidth;
+            mapCanvas.height = mapHeight;
+            const mCtx = mapCanvas.getContext('2d');
+
+            await renderMinimap(mCtx, mapWidth, mapHeight, lat, lng, zoom);
+
+            ctx.save();
+            ctx.globalAlpha = opacity;
+            ctx.drawImage(mapCanvas, mapX, mapY);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.strokeRect(mapX, mapY, mapWidth, mapHeight);
+            ctx.restore();
+          }
+
+          const fontSize = Math.max(16, Math.round(canvas.height * 0.028));
+          const lineHeight = fontSize * 1.35;
+          const paddingMargin = canvas.height * 0.035;
+
+          // กำหนด Prompt ขึ้นก่อนเพื่อให้น้ำหนักฟอนต์เท่ากันทั้งตัวเลขและภาษาไทย
+          ctx.font = `300 ${fontSize}px "Prompt", "ArialMT", "Arial", sans-serif`;
+          ctx.textBaseline = 'top';
+
+          const isRight = position.includes('right');
+          const isBottom = position.includes('bottom');
+          let startX, startY;
+
+          if (isRight) {
+            ctx.textAlign = 'right';
+            startX = canvas.width - paddingMargin;
+          } else {
+            ctx.textAlign = 'left';
+            startX = paddingMargin;
+          }
+
+          const totalTextHeight = lines.length * lineHeight;
+          startY = isBottom ? canvas.height - paddingMargin - totalTextHeight : paddingMargin;
+
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+          ctx.shadowBlur = Math.max(2, fontSize * 0.08);
+          ctx.shadowOffsetX = Math.max(1, fontSize * 0.04);
+          ctx.shadowOffsetY = Math.max(1, fontSize * 0.04);
+          ctx.fillStyle = '#FFFFFF';
+
+          lines.forEach((line, index) => {
+            const currentY = startY + (index * lineHeight);
+            ctx.fillText(line, startX, currentY);
+          });
+
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function openModal(imgSrc) {
+    document.getElementById('modalImage').src = imgSrc;
+    document.getElementById('previewModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('previewModal').style.display = 'none';
+  }
+
+  async function downloadAllPng() {
+    const processedFiles = imageItems.filter(item => item.stampedDataUrl);
+    if (processedFiles.length === 0) return;
+
+    for (let i = 0; i < processedFiles.length; i++) {
+      const item = processedFiles[i];
+      const link = document.createElement('a');
+      link.href = item.stampedDataUrl;
+      link.download = getPngFileName(item.file.name);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      await new Promise(resolve => setTimeout(resolve, 350));
+    }
+  }
+
+  renderImageList();
 </script>
 
 </body>
