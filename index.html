@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จำลองแก้วนม 8 oz - สเกลสีแดง + สีสมจริง</title>
+<style>
+* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Noto Sans Thai"; }
+body {
+  margin: 0;
+  padding: 20px;
+  background: #14181d;
+  color: #fff;
+}
+
+h1 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #f1f1f1;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  max-width: 1450px;
+  margin: 0 auto;
+}
+
+/* Section Cards */
+.card-section {
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+}
+.card-section.all-cafe { background: #2c1d11; }
+.card-section.all-select { background: #0f2338; }
+
+.section-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.sub-cups-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  height: 100%;
+}
+
+.cup-box {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cup-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ffd166;
+}
+
+/* Glass & Stage Design */
+.stage {
+  position: relative;
+  width: 250px;
+  height: 380px;
+  margin: 5px 0 15px 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* Measuring Cup Glass Shape */
+.measuring-cup {
+  position: relative;
+  width: 190px;
+  height: 310px;
+  border: 4px solid rgba(255, 255, 255, 0.6);
+  border-top: none;
+  border-radius: 0 0 30px 30px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(4px);
+  box-shadow: inset 0 0 20px rgba(255,255,255,0.2), 0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* Cup Handle */
+.measuring-cup::after {
+  content: "";
+  position: absolute;
+  right: -30px;
+  top: 30px;
+  width: 26px;
+  height: 170px;
+  border: 5px solid rgba(255, 255, 255, 0.5);
+  border-left: none;
+  border-radius: 0 25px 45px 0;
+}
+
+/* Liquid Container */
+.liquid-body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 0 0 26px 26px;
+}
+
+.liquid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transition: height 0.25s ease, bottom 0.25s ease;
+}
+
+/* Realistic Milk (Bottom Layer - Creamy Ivory) */
+.liquid-milk {
+  bottom: 0;
+  background: linear-gradient(to top, #dfcfb6, #f3e9d7);
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.6);
+}
+
+/* Realistic Milk Foam (Top Layer - White & Fluffy Texture) */
+.liquid-foam {
+  background: linear-gradient(to top, #ebe2d3, #ffffff);
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.9) 0, rgba(255,255,255,0.9) 3px, transparent 4px),
+    radial-gradient(circle at 60% 70%, rgba(255,255,255,0.8) 0, rgba(255,255,255,0.8) 4px, transparent 5px),
+    radial-gradient(circle at 80% 25%, rgba(255,255,255,0.85) 0, rgba(255,255,255,0.85) 3px, transparent 4px),
+    linear-gradient(to top, #ebe2d3, #ffffff);
+  border-top: 3px solid #ffffff;
+  box-shadow: inset 0 2px 8px rgba(255,255,255,0.9);
+}
+
+/* Red Scale Lines & Red Text Labels */
+.scale-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.mark-line {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-bottom: 1.5px solid #d32f2f;
+  font-size: 9px;
+  font-weight: 800;
+  color: #d32f2f;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 1px;
+  text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.9);
+}
+
+.mark-minor {
+  border-bottom: 1px dashed rgba(211, 47, 47, 0.65);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* Percentages based on 250ml / 8oz Max Capacity scale */
+.pos-50ml  { bottom: 20%; }
+.pos-1-4   { bottom: 24%; }  /* 1/4 CUP & 2 oz & 60ml */
+.pos-75ml  { bottom: 30%; }
+.pos-1-3   { bottom: 33.3%; }/* 1/3 CUP */
+.pos-100ml { bottom: 40%; }
+.pos-125ml { bottom: 50%; }  /* 125ml */
+.pos-1-2   { bottom: 48%; }  /* 1/2 CUP & 4 oz */
+.pos-150ml { bottom: 60%; }
+.pos-2-3   { bottom: 64%; }  /* 2/3 CUP */
+.pos-175ml { bottom: 70%; }
+.pos-3-4   { bottom: 72%; }  /* 3/4 CUP & 6 oz */
+.pos-200ml { bottom: 80%; }
+.pos-225ml { bottom: 90%; }
+.pos-1-c   { bottom: 96%; border-bottom: 2px solid #b71c1c; } /* 1 CUP & 8 oz & 250ml */
+
+/* Floating Data Badges */
+.tag {
+  position: absolute;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  z-index: 20;
+  transition: bottom 0.25s ease;
+  white-space: nowrap;
+}
+.tag-milk { background: #8d6e63; left: -75px; border: 1px solid #bcaaa4; }
+.tag-foam { background: #546e7a; left: -75px; border: 1px solid #90a4ae; }
+
+/* Controls */
+.controls {
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: auto;
+}
+.control-group {
+  margin-bottom: 8px;
+}
+.control-group label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+input[type=range] {
+  width: 100%;
+  accent-color: #ffd166;
+  cursor: pointer;
+}
+
+.total-box {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  background: rgba(255,255,255,0.15);
+  padding: 6px;
+  border-radius: 6px;
+}
+
+@media(max-width: 1100px) {
+  .main-layout { grid-template-columns: 1fr; }
+}
+@media(max-width: 700px) {
+  .sub-cups-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<h1>จำลองแก้วนม 8 oz (สเกลสีแดง + สีน้ำนมและฟองนมสมจริง)</h1>
+
+<div class="main-layout">
+
+  <!-- Section 1: All cafe -->
+  <div class="card-section all-cafe">
+    <div class="section-title">เมนูนม All cafe</div>
+    
+    <div class="cup-box">
+      <div class="cup-title">แก้วมาตรฐาน</div>
+      
+      <div class="stage">
+        <div class="measuring-cup">
+          <div class="liquid-body">
+            <div id="cafe-milk" class="liquid liquid-milk"></div>
+            <div id="cafe-foam" class="liquid liquid-foam"></div>
+          </div>
+          
+          <!-- Red Scales (CUP / oz / ml) -->
+          <div class="scale-marks">
+            <div class="mark-line pos-1-c"><span>1 CUP</span><span>8 oz</span><span>250 ml</span></div>
+            <div class="mark-line mark-minor pos-225ml"><span></span><span></span><span>225 ml</span></div>
+            <div class="mark-line pos-200ml"><span></span><span></span><span>200 ml</span></div>
+            <div class="mark-line pos-3-4"><span>3/4 CUP</span><span>6 oz</span><span></span></div>
+            <div class="mark-line mark-minor pos-175ml"><span></span><span></span><span>175 ml</span></div>
+            <div class="mark-line pos-2-3"><span>2/3 CUP</span><span></span><span></span></div>
+            <div class="mark-line pos-150ml"><span></span><span></span><span>150 ml</span></div>
+            <div class="mark-line pos-125ml"><span></span><span></span><span>125 ml</span></div>
+            <div class="mark-line pos-1-2"><span>1/2 CUP</span><span>4 oz</span><span></span></div>
+            <div class="mark-line pos-100ml"><span></span><span></span><span>100 ml</span></div>
+            <div class="mark-line pos-1-3"><span>1/3 CUP</span><span></span><span></span></div>
+            <div class="mark-line mark-minor pos-75ml"><span></span><span></span><span>75 ml</span></div>
+            <div class="mark-line pos-1-4"><span>1/4 CUP</span><span>2 oz</span><span></span></div>
+            <div class="mark-line mark-minor pos-50ml"><span></span><span></span><span>50 ml</span></div>
+          </div>
+
+          <div id="cafe-milk-tag" class="tag tag-milk">น้ำนม 2.5 oz</div>
+          <div id="cafe-foam-tag" class="tag tag-foam">ฟองนม 4.5 oz</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>
+            <span>🥛 น้ำนม (สีครีมนม)</span>
+            <span id="txt-cafe-milk">2.5 oz</span>
+          </label>
+          <input type="range" id="slider-cafe-milk" min="0" max="8" step="0.1" value="2.5">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>☁️ ฟองนม (สีขาวฟู)</span>
+            <span id="txt-cafe-foam">4.5 oz</span>
+          </label>
+          <input type="range" id="slider-cafe-foam" min="0" max="8" step="0.1" value="4.5">
+        </div>
+
+        <div class="total-box">
+          รวม: <span id="txt-cafe-total">7.0</span> oz (<span id="txt-cafe-total-ml">210</span> ml)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: All select (2 Cups) -->
+  <div class="card-section all-select">
+    <div class="section-title">เมนูนม All select</div>
+    
+    <div class="sub-cups-grid">
+      
+      <!-- Cup 1 -->
+      <div class="cup-box">
+        <div class="cup-title">All select (แก้วที่ 1)</div>
+        
+        <div class="stage">
+          <div class="measuring-cup">
+            <div class="liquid-body">
+              <div id="select1-milk" class="liquid liquid-milk"></div>
+              <div id="select1-foam" class="liquid liquid-foam"></div>
+            </div>
+            
+            <div class="scale-marks">
+              <div class="mark-line pos-1-c"><span>1 CUP</span><span>8 oz</span><span>250 ml</span></div>
+              <div class="mark-line mark-minor pos-225ml"><span></span><span></span><span>225 ml</span></div>
+              <div class="mark-line pos-200ml"><span></span><span></span><span>200 ml</span></div>
+              <div class="mark-line pos-3-4"><span>3/4 CUP</span><span>6 oz</span><span></span></div>
+              <div class="mark-line mark-minor pos-175ml"><span></span><span></span><span>175 ml</span></div>
+              <div class="mark-line pos-2-3"><span>2/3 CUP</span><span></span><span></span></div>
+              <div class="mark-line pos-150ml"><span></span><span></span><span>150 ml</span></div>
+              <div class="mark-line pos-125ml"><span></span><span></span><span>125 ml</span></div>
+              <div class="mark-line pos-1-2"><span>1/2 CUP</span><span>4 oz</span><span></span></div>
+              <div class="mark-line pos-100ml"><span></span><span></span><span>100 ml</span></div>
+              <div class="mark-line pos-1-3"><span>1/3 CUP</span><span></span><span></span></div>
+              <div class="mark-line mark-minor pos-75ml"><span></span><span></span><span>75 ml</span></div>
+              <div class="mark-line pos-1-4"><span>1/4 CUP</span><span>2 oz</span><span></span></div>
+              <div class="mark-line mark-minor pos-50ml"><span></span><span></span><span>50 ml</span></div>
+            </div>
+
+            <div id="select1-milk-tag" class="tag tag-milk">น้ำนม 2.3 oz</div>
+            <div id="select1-foam-tag" class="tag tag-foam">ฟองนม 4.7 oz</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <label>
+              <span>🥛 น้ำนม (สีครีมนม)</span>
+              <span id="txt-select1-milk">2.3 oz</span>
+            </label>
+            <input type="range" id="slider-select1-milk" min="0" max="8" step="0.1" value="2.3">
+          </div>
+
+          <div class="control-group">
+            <label>
+              <span>☁️ ฟองนม (สีขาวฟู)</span>
+              <span id="txt-select1-foam">4.7 oz</span>
+            </label>
+            <input type="range" id="slider-select1-foam" min="0" max="8" step="0.1" value="4.7">
+          </div>
+
+          <div class="total-box">
+            รวม: <span id="txt-select1-total">7.0</span> oz (<span id="txt-select1-total-ml">210</span> ml)
+          </div>
+        </div>
+      </div>
+
+      <!-- Cup 2 -->
+      <div class="cup-box">
+        <div class="cup-title">All select (แก้วที่ 2)</div>
+        
+        <div class="stage">
+          <div class="measuring-cup">
+            <div class="liquid-body">
+              <div id="select2-milk" class="liquid liquid-milk"></div>
+              <div id="select2-foam" class="liquid liquid-foam"></div>
+            </div>
+            
+            <div class="scale-marks">
+              <div class="mark-line pos-1-c"><span>1 CUP</span><span>8 oz</span><span>250 ml</span></div>
+              <div class="mark-line mark-minor pos-225ml"><span></span><span></span><span>225 ml</span></div>
+              <div class="mark-line pos-200ml"><span></span><span></span><span>200 ml</span></div>
+              <div class="mark-line pos-3-4"><span>3/4 CUP</span><span>6 oz</span><span></span></div>
+              <div class="mark-line mark-minor pos-175ml"><span></span><span></span><span>175 ml</span></div>
+              <div class="mark-line pos-2-3"><span>2/3 CUP</span><span></span><span></span></div>
+              <div class="mark-line pos-150ml"><span></span><span></span><span>150 ml</span></div>
+              <div class="mark-line pos-125ml"><span></span><span></span><span>125 ml</span></div>
+              <div class="mark-line pos-1-2"><span>1/2 CUP</span><span>4 oz</span><span></span></div>
+              <div class="mark-line pos-100ml"><span></span><span></span><span>100 ml</span></div>
+              <div class="mark-line pos-1-3"><span>1/3 CUP</span><span></span><span></span></div>
+              <div class="mark-line mark-minor pos-75ml"><span></span><span></span><span>75 ml</span></div>
+              <div class="mark-line pos-1-4"><span>1/4 CUP</span><span>2 oz</span><span></span></div>
+              <div class="mark-line mark-minor pos-50ml"><span></span><span></span><span>50 ml</span></div>
+            </div>
+
+            <div id="select2-milk-tag" class="tag tag-milk">น้ำนม 3.0 oz</div>
+            <div id="select2-foam-tag" class="tag tag-foam">ฟองนม 4.0 oz</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <label>
+              <span>🥛 น้ำนม (สีครีมนม)</span>
+              <span id="txt-select2-milk">3.0 oz</span>
+            </label>
+            <input type="range" id="slider-select2-milk" min="0" max="8" step="0.1" value="3.0">
+          </div>
+
+          <div class="control-group">
+            <label>
+              <span>☁️ ฟองนม (สีขาวฟู)</span>
+              <span id="txt-select2-foam">4.0 oz</span>
+            </label>
+            <input type="range" id="slider-select2-foam" min="0" max="8" step="0.1" value="4.0">
+          </div>
+
+          <div class="total-box">
+            รวม: <span id="txt-select2-total">7.0</span> oz (<span id="txt-select2-total-ml">210</span> ml)
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function setupCupSimulator(prefix) {
+  const milkSlider = document.getElementById(`slider-${prefix}-milk`);
+  const foamSlider = document.getElementById(`slider-${prefix}-foam`);
+
+  const milkLiquid = document.getElementById(`${prefix}-milk`);
+  const foamLiquid = document.getElementById(`${prefix}-foam`);
+
+  const milkTag = document.getElementById(`${prefix}-milk-tag`);
+  const foamTag = document.getElementById(`${prefix}-foam-tag`);
+
+  const milkText = document.getElementById(`txt-${prefix}-milk`);
+  const foamText = document.getElementById(`txt-${prefix}-foam`);
+  const totalText = document.getElementById(`txt-${prefix}-total`);
+  const totalMlText = document.getElementById(`txt-${prefix}-total-ml`);
+
+  function update() {
+    const milkVal = parseFloat(milkSlider.value);
+    const foamVal = parseFloat(foamSlider.value);
+    const totalVal = milkVal + foamVal;
+    const totalMl = Math.round(totalVal * 30); // 1 oz ≈ 30 ml
+
+    // ความสูงเปรียบเทียบกับความจุแก้ว 8 oz (96% Height Scale)
+    const milkPct = (milkVal / 8) * 96;
+    const foamPct = (foamVal / 8) * 96;
+
+    milkLiquid.style.height = `${milkPct}%`;
+    foamLiquid.style.height = `${foamPct}%`;
+    foamLiquid.style.bottom = `${milkPct}%`;
+
+    milkTag.style.bottom = `${milkPct / 2}%`;
+    foamTag.style.bottom = `${Math.min(milkPct + (foamPct / 2), 88)}%`;
+
+    milkText.textContent = `${milkVal.toFixed(1)} oz`;
+    foamText.textContent = `${foamVal.toFixed(1)} oz`;
+    totalText.textContent = `${totalVal.toFixed(1)}`;
+    totalMlText.textContent = `${totalMl}`;
+
+    milkTag.textContent = `น้ำนม ${milkVal.toFixed(1)} oz`;
+    foamTag.textContent = `ฟองนม ${foamVal.toFixed(1)} oz`;
+  }
+
+  milkSlider.addEventListener('input', update);
+  foamSlider.addEventListener('input', update);
+  update();
+}
+
+// ผูกการทำงานกับแก้วทั้ง 3 ใบ
+setupCupSimulator('cafe');
+setupCupSimulator('select1');
+setupCupSimulator('select2');
+</script>
+
+</body>
+</html>
