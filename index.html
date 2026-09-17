@@ -98,22 +98,10 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
 
-    .section-card.sec-1 {
-      border-left: 5px solid #3b82f6;
-      background: #f8fafc;
-    }
-    .section-card.sec-2 {
-      border-left: 5px solid #f59e0b;
-      background: #fffdf5;
-    }
-    .section-card.sec-3 {
-      border-left: 5px solid #ef4444;
-      background: #fff5f5;
-    }
-    .section-card.sec-4 {
-      border-left: 5px solid #10b981;
-      background: #f0fdf4;
-    }
+    .section-card.sec-1 { border-left: 5px solid #3b82f6; background: #f8fafc; }
+    .section-card.sec-2 { border-left: 5px solid #f59e0b; background: #fffdf5; }
+    .section-card.sec-3 { border-left: 5px solid #ef4444; background: #fff5f5; }
+    .section-card.sec-4 { border-left: 5px solid #10b981; background: #f0fdf4; }
 
     .section-title {
       font-size: 13px;
@@ -349,6 +337,7 @@
       color: var(--text-muted);
       text-align: center;
       padding: 4px;
+      font-weight: 400;
     }
   </style>
 </head>
@@ -397,7 +386,7 @@
           <span>📍 3. พิกัดตำแหน่ง (Google Maps)</span>
         </div>
         <div class="form-group">
-          <label for="gmapsUrlInput">วางลิงก์ Google Maps:</label>
+          <label for="gmapsUrlInput">วางลิงก์ Google Maps หรือ พิกัด:</label>
           <input type="text" id="gmapsUrlInput" placeholder="วางลิงก์ Google Maps (เช่น https://maps.app.goo.gl/...)" oninput="handleGmapsUrl(this.value)">
         </div>
       </div>
@@ -519,49 +508,75 @@
     document.getElementById('minimapOptionsGroup').style.display = show ? 'flex' : 'none';
   }
 
+  // ฟังก์ชั่นแยกพิกัด Lat, Lng จากข้อความ/URL ทุกรูปแบบ
+  function extractCoords(text) {
+    if (!text) return null;
+    try { text = decodeURIComponent(text); } catch(e){}
+
+    let match = text.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
+                text.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) ||
+                text.match(/(?:q|ll|search\/|place\/)(-?\d+\.\d+)[,\+]\s*(-?\d+\.\d+)/) ||
+                text.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+
+    if (match) {
+      return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+    }
+    return null;
+  }
+
   async function handleGmapsUrl(input) {
     if (!input || !input.trim()) return;
 
     const status = document.getElementById('statusIndicator');
     let urlStr = input.trim();
 
-    // 1. ตรวจสอบพิกัดจากลิงก์เต็มโดยตรงก่อน
-    let match = urlStr.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
-                urlStr.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) ||
-                urlStr.match(/(?:q|ll|search\/|place\/)(-?\d+\.\d+)[,\+]\s*(-?\d+\.\d+)/) ||
-                urlStr.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
-
-    if (match) {
-      currentLat = parseFloat(match[1]);
-      currentLng = parseFloat(match[2]);
+    // 1. ตรวจสอบพิกัดจากลิงก์โดยตรงก่อน
+    let coords = extractCoords(urlStr);
+    if (coords) {
+      currentLat = coords.lat;
+      currentLng = coords.lng;
+      status.innerText = '⏳ กำลังดึงข้อมูลที่อยู่...';
       await reverseGeocode();
       return;
     }
 
-    // 2. ถ้าเป็นลิงก์ย่อ (เช่น https://maps.app.goo.gl/...) ให้ดึง URL จริงผ่าน Proxy
+    // 2. หากเป็นลิงก์ย่อ ให้ลองปลดย่อลิงก์ด้วย Multi-proxy Fallback
     if (urlStr.includes('goo.gl') || urlStr.includes('maps.app')) {
-      status.innerText = '🔍 กำลังแกะพิกัดจากลิงก์...';
-      try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlStr)}`;
-        const res = await fetch(proxyUrl);
-        const data = await res.json();
-        
-        let targetUrl = data.status?.url || data.contents || '';
-        let m = targetUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
-                targetUrl.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) ||
-                targetUrl.match(/(-?\d+\.\d+)[,\+]\s*(-?\d+\.\d+)/);
+      status.innerText = '🔍 กำลังแกะพิกัดจากลิงก์ย่อ...';
 
-        if (m) {
-          currentLat = parseFloat(m[1]);
-          currentLng = parseFloat(m[2]);
-          await reverseGeocode();
-        } else {
-          status.innerText = '⚠️ ไม่พบพิกัดในลิงก์นี้';
+      const proxies = [
+        async (u) => {
+          const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`);
+          const d = await r.json();
+          return d.status?.url || d.contents || '';
+        },
+        async (u) => {
+          const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(u)}`);
+          return await r.text();
+        },
+        async (u) => {
+          const r = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`);
+          return await r.text();
         }
-      } catch (e) {
-        console.error('Failed to unshorten URL', e);
-        status.innerText = '⚠️ ดึงข้อมูลจากลิงก์ไม่สำเร็จ';
+      ];
+
+      for (let getUrlContent of proxies) {
+        try {
+          let resolvedText = await getUrlContent(urlStr);
+          let extracted = extractCoords(resolvedText);
+          if (extracted) {
+            currentLat = extracted.lat;
+            currentLng = extracted.lng;
+            status.innerText = '⏳ กำลังดึงข้อมูลที่อยู่...';
+            await reverseGeocode();
+            return;
+          }
+        } catch (e) {
+          console.warn('Proxy error, trying next fallback...', e);
+        }
       }
+
+      status.innerText = '⚠️ แกะพิกัดจากลิงก์ย่อไม่สำเร็จ (กรุณาวางลิงก์เต็ม หรือพิมพ์พิกัดโดยตรง)';
     }
   }
 
