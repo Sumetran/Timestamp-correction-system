@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบแก้ไขไทม์แสตมป์</title>
+  <title>ระบบใส่ไทม์แสตมป์ & มินิแมพ (Real-time)</title>
   
   <!-- Font Prompt -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -131,7 +131,7 @@
     .sec-title-3 { color: #b91c1c; }
     .sec-title-4 { color: #047857; }
 
-    .form-group, .coords-row > div, .custom-time-row > div {
+    .form-group, .custom-time-row > div {
       min-width: 0;
     }
 
@@ -237,12 +237,6 @@
     .btn-success { background-color: var(--success); }
     .btn-success:hover { background-color: var(--success-hover); }
     .btn-block { width: 100%; }
-
-    .coords-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
 
     #image-list-container {
       display: grid;
@@ -362,8 +356,8 @@
 
 <div class="container">
   <div class="header">
-    <h1>📸 ระบบแก้ไขไทม์แสตมป์</h1>
-    <p>วางลิงก์ Google Maps เพื่อดึงพิกัดและที่อยู่โดยละเอียดอัตโนมัติ</p>
+    <h1>📸 ระบบใส่ไทม์แสตมป์ & มินิแมพ (Real-time)</h1>
+    <p>วางลิงก์ Google Maps เพื่อดึงพิกัดและที่อยู่โดยรายละเอียดอัตโนมัติ</p>
   </div>
 
   <div class="grid-dashboard">
@@ -397,24 +391,14 @@
         <button class="btn btn-secondary btn-block" style="font-size:11px; margin-top:2px;" onclick="applyGlobalTimeToAll()">🔄 ซิงค์วัน-เวลาหลักไปทุกรูป</button>
       </div>
 
-      <!-- 3. ตั้งค่าพิกัด Google Maps -->
+      <!-- 3. วางลิงก์ Google Maps -->
       <div class="section-card sec-3">
         <div class="section-title sec-title-3">
           <span>📍 3. พิกัดตำแหน่ง (Google Maps)</span>
         </div>
         <div class="form-group">
-          <label for="gmapsUrlInput">วางลิงก์ Google Maps หรือ พิกัด:</label>
-          <input type="text" id="gmapsUrlInput" placeholder="วางลิงก์ Google Maps หรือ 14.8012, 100.6531..." oninput="parseGoogleMapsUrl(this.value)">
-        </div>
-        <div class="coords-row">
-          <div class="form-group">
-            <label>ละติจูด (Lat)</label>
-            <input type="number" id="latInput" step="any" value="14.8012" oninput="triggerAutoProcess()">
-          </div>
-          <div class="form-group">
-            <label>ลองติจูด (Long)</label>
-            <input type="number" id="lngInput" step="any" value="100.6531" oninput="triggerAutoProcess()">
-          </div>
+          <label for="gmapsUrlInput">วางลิงก์ Google Maps:</label>
+          <input type="text" id="gmapsUrlInput" placeholder="วางลิงก์ Google Maps (เช่น https://maps.app.goo.gl/...)" oninput="handleGmapsUrl(this.value)">
         </div>
       </div>
 
@@ -480,13 +464,9 @@
         </div>
 
         <div class="form-group">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label for="addressInput">รายละเอียดสถานที่:</label>
-            <button class="btn btn-secondary" style="padding:2px 6px; font-size:10px;" onclick="reverseGeocode()">🔍 ดึงสถานที่จากพิกัด</button>
-          </div>
-          <textarea id="addressInput" oninput="triggerAutoProcess()">14.801200, 100.653100
-ตำบลพรหมมาสตร์ อำเภอเมืองลพบุรี
-ลพบุรี 15000</textarea>
+          <label for="addressInput">รายละเอียดสถานที่ (ดึงให้อัตโนมัติ):</label>
+          <textarea id="addressInput" oninput="triggerAutoProcess()">15.066126, 100.727224
+รอการวางลิงก์ Google Maps...</textarea>
         </div>
       </div>
 
@@ -512,6 +492,8 @@
 <script>
   let imageItems = [];
   let debounceTimer = null;
+  let currentLat = 15.066126;
+  let currentLng = 100.727224;
 
   const now = new Date();
   document.getElementById('globalDateInput').value = now.toISOString().split('T')[0];
@@ -537,30 +519,49 @@
     document.getElementById('minimapOptionsGroup').style.display = show ? 'flex' : 'none';
   }
 
-  function parseGoogleMapsUrl(input) {
+  async function handleGmapsUrl(input) {
     if (!input || !input.trim()) return;
 
-    let lat = null;
-    let lng = null;
+    const status = document.getElementById('statusIndicator');
+    let urlStr = input.trim();
 
-    let match = input.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-
-    if (!match) {
-      match = input.match(/(?:q|ll|search\/|place\/)(-?\d+\.\d+)[,\+]\s*(-?\d+\.\d+)/);
-    }
-
-    if (!match) {
-      match = input.match(/(-?\d+\.\d+)\s*[\s,]\s*(-?\d+\.\d+)/);
-    }
+    // 1. ตรวจสอบพิกัดจากลิงก์เต็มโดยตรงก่อน
+    let match = urlStr.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
+                urlStr.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) ||
+                urlStr.match(/(?:q|ll|search\/|place\/)(-?\d+\.\d+)[,\+]\s*(-?\d+\.\d+)/) ||
+                urlStr.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
 
     if (match) {
-      lat = parseFloat(match[1]);
-      lng = parseFloat(match[2]);
+      currentLat = parseFloat(match[1]);
+      currentLng = parseFloat(match[2]);
+      await reverseGeocode();
+      return;
+    }
 
-      document.getElementById('latInput').value = lat.toFixed(6);
-      document.getElementById('lngInput').value = lng.toFixed(6);
+    // 2. ถ้าเป็นลิงก์ย่อ (เช่น https://maps.app.goo.gl/...) ให้ดึง URL จริงผ่าน Proxy
+    if (urlStr.includes('goo.gl') || urlStr.includes('maps.app')) {
+      status.innerText = '🔍 กำลังแกะพิกัดจากลิงก์...';
+      try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlStr)}`;
+        const res = await fetch(proxyUrl);
+        const data = await res.json();
+        
+        let targetUrl = data.status?.url || data.contents || '';
+        let m = targetUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
+                targetUrl.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) ||
+                targetUrl.match(/(-?\d+\.\d+)[,\+]\s*(-?\d+\.\d+)/);
 
-      reverseGeocode();
+        if (m) {
+          currentLat = parseFloat(m[1]);
+          currentLng = parseFloat(m[2]);
+          await reverseGeocode();
+        } else {
+          status.innerText = '⚠️ ไม่พบพิกัดในลิงก์นี้';
+        }
+      } catch (e) {
+        console.error('Failed to unshorten URL', e);
+        status.innerText = '⚠️ ดึงข้อมูลจากลิงก์ไม่สำเร็จ';
+      }
     }
   }
 
@@ -593,8 +594,8 @@
   });
 
   async function reverseGeocode() {
-    const latVal = parseFloat(document.getElementById('latInput').value);
-    const lngVal = parseFloat(document.getElementById('lngInput').value);
+    const latVal = currentLat;
+    const lngVal = currentLng;
     if (isNaN(latVal) || isNaN(lngVal)) return;
 
     const coordString = `${latVal.toFixed(6)}, ${lngVal.toFixed(6)}`;
@@ -764,8 +765,8 @@
     const showMinimap = document.getElementById('showMinimapSelect').value === 'yes';
     const minimapPos = document.getElementById('minimapPosSelect').value;
     const minimapSizePct = parseFloat(document.getElementById('minimapSizeInput').value) / 100;
-    const lat = parseFloat(document.getElementById('latInput').value) || 0;
-    const lng = parseFloat(document.getElementById('lngInput').value) || 0;
+    const lat = currentLat;
+    const lng = currentLng;
     const zoom = parseInt(document.getElementById('zoomSelect').value) || 15;
     const opacity = parseFloat(document.getElementById('minimapOpacityInput').value) || 1.0;
 
@@ -902,7 +903,6 @@
           const lineHeight = fontSize * 1.35;
           const paddingMargin = canvas.height * 0.035;
 
-          // กำหนด Prompt ขึ้นก่อนเพื่อให้น้ำหนักฟอนต์เท่ากันทั้งตัวเลขและภาษาไทย
           ctx.font = `300 ${fontSize}px "Prompt", "ArialMT", "Arial", sans-serif`;
           ctx.textBaseline = 'top';
 
